@@ -1,11 +1,11 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct{
     char name[20];
     int score[3];
     int sum;
     float avg;
-    int flag;
 } Score;
  
 int addScore(Score *s){
@@ -23,7 +23,6 @@ int addScore(Score *s){
 
     s->sum = s->score[0] + s->score[1] + s->score[2];
     s->avg = ((float)s->sum/3);
-    s->flag = 1;
 
     printf("=> 성공적으로 추가 하였습니다.\n");
 
@@ -35,7 +34,7 @@ void readScore(Score s){
 }
 
 int updateScore(Score *s){
-    if(s->flag == 0){
+    if(s == NULL){
         printf("=> 이 번호에 학생 등록이 안되어 있습니다.\n");
         return 1;
     }else{
@@ -53,31 +52,8 @@ int updateScore(Score *s){
 
         s->sum = s->score[0] + s->score[1] + s->score[2];
         s->avg = ((float)s->sum/3);
-        s->flag = 1;
 
         printf("=> 수정성공!\n");
-        return 1;
-    }
-    return 1;
-}
-
-int deleteScore(Score *s){
-    if(s->flag == 0){
-        printf("=> 삭제할 데이터가 없습니다.\n");
-        return 1;
-    }else{
-        s->flag = 0;
-        for(int i=0; i<sizeof(s->name); i++){
-            s->name[i] = ' ';
-        }
-        for(int i=0; i<sizeof(s->score)/sizeof(int); i++){
-            s->score[i] = -1;
-        }
-        s->sum = -1;
-        s->avg = -1.0;
-
-        printf("=> 삭제됨!\n");
-        
         return 1;
     }
     return 1;
@@ -96,17 +72,17 @@ int selectMenu(){
     return menu;
 }
 
-void listScore(Score *s, int index){
+void listScore(Score *s[], int index){
     printf("no\tName\tKor\tEng\tMath\tSum\tAvg\n");
     printf("===============================================================\n");
     for(int i=0; i<index; i++){
-        if(s[i].flag == 0) continue;
+        if(s[i] == NULL) continue;
         printf("%d\t", i+1);
-        readScore(s[i]);
+        readScore(*s[i]);
     }
 }
 
-int selectDataNo(Score *s, int index){
+int selectDataNo(Score *s[], int index){
     int no;
     listScore(s, index);
     printf("번호는(취소:0) ");
@@ -115,26 +91,27 @@ int selectDataNo(Score *s, int index){
 }
 
 int main(void){
-    Score s[100];
-    int index = 0;
-    for(int i=0; i<20; i++){
-        s[i].flag = 0;
+    Score *s[100];
+    for(int i=0; i<100; i++){
+        s[i] = NULL;
     }
+    int index = 0;
     int count = 0, menu;
  
     while (1){
         menu = selectMenu();
         if (menu == 0) break;
         if (menu == 1){
-            if(index>0){
+            if(count>0){
                 listScore(s, index);
             }else{
                 printf("=> 조회 할 데이터가 없습니다.\n");
             }
         }
         else if (menu == 2){
-            if(count<2){
-                count += addScore(&s[index++]);
+            if(count<20){
+                s[index] = (Score*)malloc(sizeof(Score));
+                count += addScore(s[index++]);
             }else{
                 printf("=> 20명의 학생 제한이 있어 더 추가 못합니다.\n");
             }
@@ -143,7 +120,7 @@ int main(void){
             if(count > 0){
                 int no = selectDataNo(s, index);
                 if(no > 0){
-                    updateScore(&s[no-1]);
+                    updateScore(s[no-1]);
                 }else{
                     printf("=> 취소 되었습니다.\n");
                 }
@@ -159,7 +136,8 @@ int main(void){
                     printf("정말로 삭제하시겠습니까?(1: 삭제) ");
                     scanf("%d", &delok);
                     if(delok == 1){
-                        deleteScore(&s[no-1]);
+                        s[no-1] = NULL;
+                        printf("삭제됨!\n");
                         count--;
                     }else{
                         printf("=> 삭제 취소 되었습니다.\n");

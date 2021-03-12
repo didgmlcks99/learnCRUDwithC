@@ -117,7 +117,7 @@ int selectDataNo(Score *s, int index){
 int main(void){
     Score s[100];
     int index = 0;
-    for(int i=0; i<20; i++){
+    for(int i=0; i<100; i++){
         s[i].flag = 0;
     }
     int count = 0, menu;
@@ -126,17 +126,17 @@ int main(void){
         menu = selectMenu();
         if (menu == 0) break;
         if (menu == 1){
-            if(index>0){
+            if(count>0){
                 listScore(s, index);
             }else{
                 printf("=> 조회 할 데이터가 없습니다.\n");
             }
         }
         else if (menu == 2){
-            if(count<2){
+            if(count<20){
                 count += addScore(&s[index++]);
             }else{
-                printf("=> 20명의 학생 제한이 있어 더 추가 못합니다.\n");
+                printf("=> 20명의 학생 제한이 있어 더 추가 할 수 없스니다.\n");
             }
         }
         else if (menu == 3){
@@ -156,7 +156,7 @@ int main(void){
                 int no = selectDataNo(s, index);
                 if(no > 0){
                     int delok;
-                    printf("정말로 삭제하시겠습니까?(1: 삭제) ");
+                    printf("정말로 삭제하시겠습니까?(1:삭제) ");
                     scanf("%d", &delok);
                     if(delok == 1){
                         deleteScore(&s[no-1]);
